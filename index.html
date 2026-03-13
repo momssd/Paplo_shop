@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pablo Shop - Gaming & Discord Merch</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* [Previous CSS remains the same - I'll add new styles here] */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; color: #333; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        /* LOGIN MODAL */
+        .login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
+        .login-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; max-width: 400px; width: 90%; }
+        .login-form input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+        .login-btn { width: 100%; background: linear-gradient(45deg, #00ff88, #00cc6a); color: black; border: none; padding: 0.8rem; border-radius: 25px; font-weight: bold; cursor: pointer; }
+        
+        /* ACCOUNT DASHBOARD */
+        .account-panel { display: none; position: fixed; top: 80px; right: 0; width: 350px; height: 80vh; background: white; border-radius: 15px 0 0 15px; box-shadow: -5px 0 20px rgba(0,0,0,0.3); z-index: 1001; overflow-y: auto; }
+        .account-header { background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 15px 0 0 0; }
+        .account-info { padding: 1rem; }
+        .order-history { padding: 1rem; border-top: 1px solid #eee; }
+        .order-item { background: #f8f9fa; padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 8px; }
+        
+        /* CART UPDATES */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee; }
+        .cart-item img { width: 50px; height: 50px; border-radius: 8px; }
+        .remove-item { background: #ff6b6b; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 50%; cursor: pointer; }
+        
+        /* USER STATUS */
+        .user-status { position: fixed; top: 20px; right: 20px; background: rgba(0,255,136,0.9); color: black; padding: 0.5rem 1rem; border-radius: 25px; font-weight: bold; z-index: 999; }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) { .account-panel { width: 100%; right: 0; height: 70vh; } }
+    </style>
+</head>
+<body>
+    <!-- USER STATUS -->
+    <div class="user-status" id="userStatus" style="display: none;">
+        <i class="fas fa-user"></i> <span id="userName">Guest</span>
+    </div>
+
+    <!-- [Previous header with login button] -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">🎮 Pablo Shop</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#partners">Partners</a></li>
+            </ul>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span>)
+                </button>
+                <button id="loginBtn" class="login-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="toggleLogin()">
+                    <i class="fas fa-user"></i> Login
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- LOGIN MODAL -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h3>Login to Pablo Shop</h3>
+            <form onsubmit="login(event)">
+                <input type="text" id="loginUsername" placeholder="Username" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem;">
+                New? <a href="#" onclick="createAccount()" style="color: #667eea;">Create Account</a>
+            </p>
+            <button onclick="toggleLogin()" style="width: 100%; background: #666; color: white; border: none; padding: 0.8rem; border-radius: 8px;">Close</button>
+        </div>
+    </div>
+
+    <!-- [Previous hero, banner, products sections remain the same] -->
+    <!-- I'll add the JavaScript that handles everything -->
+
+    <!-- ACCOUNT PANEL -->
+    <div class="account-panel" id="accountPanel">
+        <div class="account-header">
+            <h3>My Account</h3>
+            <button onclick="logout()" style="background: none; color: white; border: 1px solid white; padding: 0.3rem 0.6rem; border-radius: 15px; cursor: pointer;">Logout</button>
+        </div>
+        <div class="account-info">
+            <h4 id="accountWelcome">Welcome back!</h4>
+            <p>Rubux Balance: <span id="userBalance" style="color: #00ff88; font-weight: bold;">5000</span></p>
+        </div>
+        <div class="order-history">
+            <h4>Recent Orders</h4>
+            <div id="orderHistory"></div>
+        </div>
+    </div>
+
+    <!-- [Previous cart modal, AI support, admin panel] -->
+
+    <script>
+        // === DATA ===
+        let products = [
+            { id: 1, name: "Discord Nitro 1 Month", price: 800, icon: "💎" },
+            { id: 2, name: "Gaming Mouse Pad RGB", price: 450, icon: "🖱️" },
+            { id: 3, name: "Discord Server Boost", price: 1200, icon: "🚀" },
+            { id: 4, name: "Robux 1000", price: 1000, icon: "💰" },
+            { id: 5, name: "Custom Discord Emote", price: 300, icon: "😎" },
+            { id: 6, name: "Gaming Headset", price: 2500, icon: "🎧" },
+            { id: 7, name: "Nitro Classic 3 Months", price: 2000, icon: "⭐" },
+            { id: 8, name: "Keyboard RGB", price: 1800, icon: "⌨️" },
+            { id: 9, name: "Discord Role", price: 500, icon: "👑" },
+            { id: 10, name: "Gaming Chair", price: 5000, icon: "🪑" },
+            { id: 11, name: "Robux 5000", price: 4500, icon: "💎" },
+            { id: 12, name: "Custom Avatar", price: 750, icon: "🎨" },
+            { id: 13, name: "Server Banner", price: 900, icon: "🏳️" },
+            { id: 14, name: "Gaming Mouse", price: 1200, icon: "🖱️" },
+            { id: 15, name: "Nitro Boost", price: 1500, icon: "⚡" },
+            { id: 16, name: "Profile Badge", price: 400, icon: "🏅" },
+            { id: 17, name: "Custom Bot", price: 3000, icon: "🤖" },
+            { id: 18, name: "Gaming Poster", price: 250, icon: "🖼️" },
+            { id: 19, name: "VIP Discord Access", price: 2000, icon: "🔑" },
+            { id: 20, name: "Ultimate Bundle", price: 8000, icon: "🎁" }
+        ];
+
+        let cart = [];
+        let users = JSON.parse(localStorage.getItem('pabloShopUsers')) || {};
+        let currentUser = null;
+        let orders = JSON.parse(localStorage.getItem('pabloShopOrders')) || {};
+
+        // === LOGIN SYSTEM ===
+        function toggleLogin() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                document.getElementById('loginBtn').innerHTML = `<i class="fas fa-user-check"></i> ${username}`;
+                document.getElementById('loginBtn').onclick = toggleAccount;
+                document.getElementById('userStatus').style.display = 'block';
+                document.getElementById('userName').textContent = username;
+                document.getElementById('accountWelcome').textContent = `Welcome back, ${username}!`;
+                document.getElementById('loginModal').style.display = 'none';
+                loadUserOrders();
+                updateCartDisplay();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function createAccount() {
+            const username = prompt('Choose username:');
+            const password = prompt('Choose password:');
+            if (username && password && !users[username]) {
+                users[username] = { password, balance: 5000, orders: [] };
+                localStorage.setItem('pabloShopUsers', JSON.stringify(users));
+                alert('Account created! Please login.');
+            } else {
+                alert('Username taken or invalid!');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginBtn').innerHTML = '<i class="fas fa-user"></i> Login';
+            document.getElementById('loginBtn').onclick = toggleLogin;
+            document.getElementById('userStatus').style.display = 'none';
+            document.getElementById('accountPanel').style.display = 'none';
+        }
+
+        function toggleAccount() {
+            const panel = document.getElementById('accountPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // === SHOPPING CART ===
+        function addToCart(productId) {
+            if (!currentUser) {
+                alert('Please login to purchase!');
+                toggleLogin();
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+            alert(`${product.name} added to cart!`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartTotalItems').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            const cartItems = document.getElementById('cartItems');
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cartTotal').textContent = total;
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div>
+                        <div>${item.icon} ${item.name}</div>
+                        <small>${item.quantity}x ${item.price} Rubux = ${(item.price * item.quantity).toLocaleString()}</small>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="remove-item">×</button>
+                </div>
+            `).join('') || '<p>Your cart is empty</p>';
+        }
+
+        function toggleCart() {
+            document.getElementById('cartModal').style.display = 'block';
+            updateCartDisplay();
+        }
+
+        function checkout() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            if (!currentUser) {
+                alert('Please login first!');
+                return;
+            }
+
+            if (users[currentUser].balance < total) {
+                alert('Insufficient Rubux balance!');
+                return;
+            }
+
+            // Process order
+            users[currentUser].balance -= total;
+            const order = {
+                id: Date.now(),
+                items: cart.map(item => ({...item})),
+                total,
+                date: new Date().toLocaleString()
+            };
+            
+            orders[currentUser] = orders[currentUser] || [];
+            orders[currentUser].unshift(order);
+            users[currentUser].orders = orders[currentUser];
+            
+            localStorage.setItem('pabloShopUsers', JSON.stringify(users));
+            localStorage.setItem('pabloShopOrders', JSON.stringify(orders));
+            
+            cart = [];
+            document.getElementById('cartModal').style.display = 'none';
+            document.getElementById('userBalance').textContent = users[currentUser].balance.toLocaleString();
+            
+            alert(`Order #${order.id} completed! Check your account for details.`);
+            loadUserOrders();
+        }
+
+        function loadUserOrders() {
+            if (currentUser && orders[currentUser]) {
+                const history = document.getElementById('orderHistory');
+                history.innerHTML = orders[currentUser].slice(0, 5).map(order => `
+                    <div class="order-item">
+                        <strong>Order #${order.id}</strong><br>
+                        <small>${order.date} - ${order.total.toLocaleString()} Rubux</small>
+                    </div>
+                `).join('') || '<p>No orders yet</p>';
+            }
+        }
+
+        // === RENDER PRODUCTS ===
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(product => `
+                <div class="product-card" onclick="addToCart(${product.id})">
+                    <div class="product-image">${product.icon}</div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-price">${product.price.toLocaleString()} <span style="font-size: 0.8rem;">Rubux</span></div>
+                        <button class="buy-btn">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // === ADMIN PANEL (Password: BestShop22) ===
+        function checkPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'BestShop22') {
+                document.getElementById('adminContent').style.display = 'block';
+                const select = document.getElementById('productToEdit');
+                select.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            } else {
+                alert('Wrong password!');
+            }
+        }
+
+        // === AI SUPPORT (Simple responses) ===
+        function toggleSupport() {
+            const chat = document.getElementById('supportChat');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messages = document.getElementById('chatMessages');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            messages.innerHTML += `<div class="message user-message">${message}</div>`;
+            input.value = '';
+            
+            setTimeout(() => {
+                const responses = [
+                    "Your order has been processed successfully!",
+                    "Rubux payments are secure and instant.",
+                    "Contact support@pabloshop.com for issues.",
+                    "All products have instant delivery.",
+                    "Login to view your order history."
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                messages.innerHTML += `<div class="message ai-message">${response}</div>`;
+                messages.scrollTop = messages.scrollHeight;
+            }, 1000);
+        }
+
+        // === INIT ===
+        window.onload = function() {
+            renderProducts();
+            updateCartDisplay();
+            
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+       
