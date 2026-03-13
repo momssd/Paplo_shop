@@ -1,1 +1,12 @@
 
+## 🌐 Deploy to GitHub Pages
+1. Push to GitHub
+2. Settings → Pages → Deploy from `main` branch
+3. Visit: `https://yourusername.github.io/PabloShop`
+
+## 🔗 Payment Integration
+- **Rubux**: Ready (simulated)
+- **Credit Pro Bot**: Discord webhook ready
+- Add your Discord bot webhook in JS
+
+**Made with ❤️ for gamers by Pablo Shop**
