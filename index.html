@@ -6,42 +6,60 @@
     <title>Pablo Shop - Gaming & Discord Merch</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* [Previous CSS remains the same - I'll add new styles here] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; color: #333; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         
-        /* LOGIN MODAL */
-        .login-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
-        .login-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; max-width: 400px; width: 90%; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Header */
+        header { background: rgba(0,0,0,0.95); padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: #00ff88; text-decoration: none; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: #00ff88; }
+        .cart-btn, .login-btn { background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        
+        /* Hero with YOUR Discord Image */
+        .hero { 
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+            url('https://media.discordapp.net/attachments/1474475898555072524/1481803942831591425/IMG_0782.png?ex=69b54db6&is=69b3fc36&hm=1d27aa6d674bf9421c8de136d58f20b79d586576287bd3f50cf390bfc2378fa1&=&format=webp&quality=lossless');
+            background-size: cover; background-position: center; height: 100vh; display: flex; align-items: center; text-align: center; color: white; margin-top: 80px;
+        }
+        .hero-content h1 { font-size: 4rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.9); margin-bottom: 1rem; }
+        .hero-content p { font-size: 1.4rem; margin-bottom: 2rem; }
+        .cta-btn { background: linear-gradient(45deg, #00ff88, #00cc6a); color: black; padding: 1.2rem 3rem; border: none; border-radius: 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; text-decoration: none; transition: transform 0.3s; }
+        .cta-btn:hover { transform: scale(1.05); }
+        
+        /* Sections */
+        .banner-section { background: #1a1a2e; color: white; padding: 4rem 0; }
+        .banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .banner-item { text-align: center; padding: 2rem; background: rgba(255,255,255,0.1); border-radius: 15px; backdrop-filter: blur(10px); }
+        
+        .products-section { padding: 5rem 0; background: white; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s; cursor: pointer; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .product-image { height: 200px; background: linear-gradient(45deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; }
+        .product-info { padding: 1.5rem; }
+        .product-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .product-price { font-size: 1.5rem; color: #00ff88; font-weight: bold; margin-bottom: 1rem; }
+        .buy-btn { width: 100%; background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; border: none; padding: 0.8rem; border-radius: 25px; font-weight: bold; cursor: pointer; }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
         .login-form input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; }
-        .login-btn { width: 100%; background: linear-gradient(45deg, #00ff88, #00cc6a); color: black; border: none; padding: 0.8rem; border-radius: 25px; font-weight: bold; cursor: pointer; }
         
-        /* ACCOUNT DASHBOARD */
-        .account-panel { display: none; position: fixed; top: 80px; right: 0; width: 350px; height: 80vh; background: white; border-radius: 15px 0 0 15px; box-shadow: -5px 0 20px rgba(0,0,0,0.3); z-index: 1001; overflow-y: auto; }
-        .account-header { background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 15px 0 0 0; }
-        .account-info { padding: 1rem; }
-        .order-history { padding: 1rem; border-top: 1px solid #eee; }
-        .order-item { background: #f8f9fa; padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 8px; }
+        /* AI Support */
+        .ai-support { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: linear-gradient(45deg, #00ff88, #00cc6a); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 20px rgba(0,255,136,0.4); z-index: 1000; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         
-        /* CART UPDATES */
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee; }
-        .cart-item img { width: 50px; height: 50px; border-radius: 8px; }
-        .remove-item { background: #ff6b6b; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 50%; cursor: pointer; }
-        
-        /* USER STATUS */
-        .user-status { position: fixed; top: 20px; right: 20px; background: rgba(0,255,136,0.9); color: black; padding: 0.5rem 1rem; border-radius: 25px; font-weight: bold; z-index: 999; }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) { .account-panel { width: 100%; right: 0; height: 70vh; } }
+        @media (max-width: 768px) { .hero-content h1 { font-size: 2.5rem; } .nav-links { display: none; } }
     </style>
 </head>
 <body>
-    <!-- USER STATUS -->
-    <div class="user-status" id="userStatus" style="display: none;">
-        <i class="fas fa-user"></i> <span id="userName">Guest</span>
-    </div>
-
-    <!-- [Previous header with login button] -->
+    <!-- Header -->
     <header>
         <nav class="container">
             <a href="#" class="logo">🎮 Pablo Shop</a>
@@ -50,300 +68,171 @@
                 <li><a href="#products">Products</a></li>
                 <li><a href="#partners">Partners</a></li>
             </ul>
-            <div style="display: flex; gap: 1rem; align-items: center;">
+            <div>
                 <button class="cart-btn" onclick="toggleCart()">
-                    <i class="fas fa-shopping-cart"></i> Cart (<span id="cartCount">0</span>)
+                    <i class="fas fa-shopping-cart"></i> (<span id="cartCount">0</span>)
                 </button>
-                <button id="loginBtn" class="login-btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="toggleLogin()">
+                <button id="loginBtn" class="login-btn" style="margin-left: 1rem;" onclick="toggleLogin()">
                     <i class="fas fa-user"></i> Login
                 </button>
             </div>
         </nav>
     </header>
 
-    <!-- LOGIN MODAL -->
-    <div class="login-modal" id="loginModal">
-        <div class="login-content">
-            <h3>Login to Pablo Shop</h3>
+    <!-- Hero with YOUR Discord Image -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Pablo Shop</h1>
+                <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); max-width: 700px; margin: 0 auto 2rem;">
+                    <p style="font-size: 1.4rem; margin-bottom: 1.5rem;">
+                        🎮 Premium Gaming & Discord Merchandise<br>
+                        💎 Secure Rubux & Credit Pro Bot Payments<br>
+                        ⚡ Instant Delivery • 24/7 AI Support
+                    </p>
+                </div>
+                <a href="#products" class="cta-btn">🛒 Start Shopping</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="banner-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem;">Why Pablo Shop?</h2>
+            <div class="banner-grid">
+                <div class="banner-item">
+                    <i class="fas fa-shield-alt" style="font-size: 3rem; color: #00ff88; margin-bottom: 1rem;"></i>
+                    <h3>100% Secure</h3>
+                    <p>Rubux & Credit Pro Bot payments with bank-level security</p>
+                </div>
+                <div class="banner-item">
+                    <i class="fas fa-bolt" style="font-size: 3rem; color: #00ff88; margin-bottom: 1rem;"></i>
+                    <h3>Instant Delivery</h3>
+                    <p>Products delivered in seconds after payment</p>
+                </div>
+                <div class="banner-item">
+                    <i class="fas fa-robot" style="font-size: 3rem; color: #00ff88; margin-bottom: 1rem;"></i>
+                    <h3>AI Support</h3>
+                    <p>24/7 intelligent chatbot assistance</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section id="products" class="products-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem;">Featured Products</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 3rem;">20 Premium Items - Prices in Rubux</p>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </section>
+
+    <!-- AI Support -->
+    <div class="ai-support" onclick="toggleSupport()">
+        <i class="fas fa-robot" style="font-size: 1.5rem;"></i>
+    </div>
+    <div class="modal" id="supportChat" style="justify-content: flex-end; align-items: flex-end; padding: 20px;">
+        <div class="modal-content" style="width: 350px; height: 500px; display: flex; flex-direction: column;">
+            <div style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between;">
+                <span>🤖 Pablo AI Support</span>
+                <i class="fas fa-times" onclick="toggleSupport()" style="cursor: pointer;"></i>
+            </div>
+            <div id="chatMessages" style="flex: 1; padding: 1rem; overflow-y: auto; background: #f8f9fa;"></div>
+            <div style="padding: 1rem; display: flex; gap: 0.5rem;">
+                <input id="chatInput" style="flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 0.8rem 1rem;" placeholder="Ask me anything..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" style="background: #667eea; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h3>👤 Login to Pablo Shop</h3>
             <form onsubmit="login(event)">
                 <input type="text" id="loginUsername" placeholder="Username" required>
                 <input type="password" id="loginPassword" placeholder="Password" required>
-                <button type="submit" class="login-btn">Login</button>
+                <button type="submit" class="cta-btn" style="margin-top: 1rem;">Login</button>
             </form>
-            <p style="text-align: center; margin-top: 1rem;">
-                New? <a href="#" onclick="createAccount()" style="color: #667eea;">Create Account</a>
+            <p style="text-align: center; margin-top: 1rem; color: #666;">
+                New? <a href="#" onclick="createAccount()" style="color: #667eea; font-weight: bold;">Create Account</a>
             </p>
-            <button onclick="toggleLogin()" style="width: 100%; background: #666; color: white; border: none; padding: 0.8rem; border-radius: 8px;">Close</button>
         </div>
     </div>
 
-    <!-- [Previous hero, banner, products sections remain the same] -->
-    <!-- I'll add the JavaScript that handles everything -->
-
-    <!-- ACCOUNT PANEL -->
-    <div class="account-panel" id="accountPanel">
-        <div class="account-header">
-            <h3>My Account</h3>
-            <button onclick="logout()" style="background: none; color: white; border: 1px solid white; padding: 0.3rem 0.6rem; border-radius: 15px; cursor: pointer;">Logout</button>
-        </div>
-        <div class="account-info">
-            <h4 id="accountWelcome">Welcome back!</h4>
-            <p>Rubux Balance: <span id="userBalance" style="color: #00ff88; font-weight: bold;">5000</span></p>
-        </div>
-        <div class="order-history">
-            <h4>Recent Orders</h4>
-            <div id="orderHistory"></div>
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <h3>🛒 Shopping Cart (<span id="cartTotalItems">0</span>)</h3>
+            <div id="cartItems" style="margin-bottom: 2rem;"></div>
+            <div style="border-top: 2px solid #eee; padding-top: 1rem;">
+                <h4>Total: <span id="cartTotal" style="color: #00ff88; font-size: 1.8rem;">0</span> Rubux</h4>
+                <button onclick="checkout()" class="cta-btn" style="width: 100%; margin-top: 1rem; background: linear-gradient(45deg, #00ff88, #00cc6a);">💳 Checkout</button>
+            </div>
         </div>
     </div>
-
-    <!-- [Previous cart modal, AI support, admin panel] -->
 
     <script>
-        // === DATA ===
+        // Products (20 items with emojis)
         let products = [
-            { id: 1, name: "Discord Nitro 1 Month", price: 800, icon: "💎" },
-            { id: 2, name: "Gaming Mouse Pad RGB", price: 450, icon: "🖱️" },
-            { id: 3, name: "Discord Server Boost", price: 1200, icon: "🚀" },
-            { id: 4, name: "Robux 1000", price: 1000, icon: "💰" },
-            { id: 5, name: "Custom Discord Emote", price: 300, icon: "😎" },
-            { id: 6, name: "Gaming Headset", price: 2500, icon: "🎧" },
-            { id: 7, name: "Nitro Classic 3 Months", price: 2000, icon: "⭐" },
-            { id: 8, name: "Keyboard RGB", price: 1800, icon: "⌨️" },
-            { id: 9, name: "Discord Role", price: 500, icon: "👑" },
-            { id: 10, name: "Gaming Chair", price: 5000, icon: "🪑" },
-            { id: 11, name: "Robux 5000", price: 4500, icon: "💎" },
-            { id: 12, name: "Custom Avatar", price: 750, icon: "🎨" },
-            { id: 13, name: "Server Banner", price: 900, icon: "🏳️" },
-            { id: 14, name: "Gaming Mouse", price: 1200, icon: "🖱️" },
-            { id: 15, name: "Nitro Boost", price: 1500, icon: "⚡" },
-            { id: 16, name: "Profile Badge", price: 400, icon: "🏅" },
-            { id: 17, name: "Custom Bot", price: 3000, icon: "🤖" },
-            { id: 18, name: "Gaming Poster", price: 250, icon: "🖼️" },
-            { id: 19, name: "VIP Discord Access", price: 2000, icon: "🔑" },
-            { id: 20, name: "Ultimate Bundle", price: 8000, icon: "🎁" }
+            {id:1,name:"Discord Nitro 1M",price:800,icon:"💎"},
+            {id:2,name:"RGB Mouse Pad",price:450,icon:"🖱️"},
+            {id:3,name:"Server Boost",price:1200,icon:"🚀"},
+            {id:4,name:"Robux 1000",price:1000,icon:"💰"},
+            {id:5,name:"Custom Emote",price:300,icon:"😎"},
+            {id:6,name:"Gaming Headset",price:2500,icon:"🎧"},
+            {id:7,name:"Nitro Classic",price:2000,icon:"⭐"},
+            {id:8,name:"RGB Keyboard",price:1800,icon:"⌨️"},
+            {id:9,name:"VIP Role",price:500,icon:"👑"},
+            {id:10,name:"Gaming Chair",price:5000,icon:"🪑"},
+            {id:11,name:"Robux 5000",price:4500,icon:"💎"},
+            {id:12,name:"Custom Avatar",price:750,icon:"🎨"},
+            {id:13,name:"Server Banner",price:900,icon:"🏳️"},
+            {id:14,name:"Gaming Mouse",price:1200,icon:"🖱️"},
+            {id:15,name:"Nitro Boost",price:1500,icon:"⚡"},
+            {id:16,name:"Profile Badge",price:400,icon:"🏅"},
+            {id:17,name:"Custom Bot",price:3000,icon:"🤖"},
+            {id:18,name:"Gaming Poster",price:250,icon:"🖼️"},
+            {id:19,name:"VIP Access",price:2000,icon:"🔑"},
+            {id:20,name:"Ultimate Bundle",price:8000,icon:"🎁"}
         ];
 
         let cart = [];
-        let users = JSON.parse(localStorage.getItem('pabloShopUsers')) || {};
         let currentUser = null;
-        let orders = JSON.parse(localStorage.getItem('pabloShopOrders')) || {};
+        let users = JSON.parse(localStorage.getItem('pabloUsers')) || {};
+        let orders = JSON.parse(localStorage.getItem('pabloOrders')) || {};
 
-        // === LOGIN SYSTEM ===
-        function toggleLogin() {
-            document.getElementById('loginModal').style.display = 'block';
-        }
-
-        function login(event) {
-            event.preventDefault();
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (users[username] && users[username].password === password) {
-                currentUser = username;
-                document.getElementById('loginBtn').innerHTML = `<i class="fas fa-user-check"></i> ${username}`;
-                document.getElementById('loginBtn').onclick = toggleAccount;
-                document.getElementById('userStatus').style.display = 'block';
-                document.getElementById('userName').textContent = username;
-                document.getElementById('accountWelcome').textContent = `Welcome back, ${username}!`;
-                document.getElementById('loginModal').style.display = 'none';
-                loadUserOrders();
-                updateCartDisplay();
-            } else {
-                alert('Invalid credentials!');
-            }
-        }
-
-        function createAccount() {
-            const username = prompt('Choose username:');
-            const password = prompt('Choose password:');
-            if (username && password && !users[username]) {
-                users[username] = { password, balance: 5000, orders: [] };
-                localStorage.setItem('pabloShopUsers', JSON.stringify(users));
-                alert('Account created! Please login.');
-            } else {
-                alert('Username taken or invalid!');
-            }
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('loginBtn').innerHTML = '<i class="fas fa-user"></i> Login';
-            document.getElementById('loginBtn').onclick = toggleLogin;
-            document.getElementById('userStatus').style.display = 'none';
-            document.getElementById('accountPanel').style.display = 'none';
-        }
-
-        function toggleAccount() {
-            const panel = document.getElementById('accountPanel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-
-        // === SHOPPING CART ===
-        function addToCart(productId) {
-            if (!currentUser) {
-                alert('Please login to purchase!');
-                toggleLogin();
-                return;
-            }
-
-            const product = products.find(p => p.id === productId);
-            const existing = cart.find(item => item.id === productId);
-            
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ ...product, quantity: 1 });
-            }
-            
-            updateCartDisplay();
-            alert(`${product.name} added to cart!`);
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCartDisplay();
-        }
-
-        function updateCartDisplay() {
-            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cartTotalItems').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            const cartItems = document.getElementById('cartItems');
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            document.getElementById('cartTotal').textContent = total;
-            
-            cartItems.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <div>
-                        <div>${item.icon} ${item.name}</div>
-                        <small>${item.quantity}x ${item.price} Rubux = ${(item.price * item.quantity).toLocaleString()}</small>
-                    </div>
-                    <button onclick="removeFromCart(${item.id})" class="remove-item">×</button>
-                </div>
-            `).join('') || '<p>Your cart is empty</p>';
-        }
-
-        function toggleCart() {
-            document.getElementById('cartModal').style.display = 'block';
-            updateCartDisplay();
-        }
-
-        function checkout() {
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-            if (!currentUser) {
-                alert('Please login first!');
-                return;
-            }
-
-            if (users[currentUser].balance < total) {
-                alert('Insufficient Rubux balance!');
-                return;
-            }
-
-            // Process order
-            users[currentUser].balance -= total;
-            const order = {
-                id: Date.now(),
-                items: cart.map(item => ({...item})),
-                total,
-                date: new Date().toLocaleString()
-            };
-            
-            orders[currentUser] = orders[currentUser] || [];
-            orders[currentUser].unshift(order);
-            users[currentUser].orders = orders[currentUser];
-            
-            localStorage.setItem('pabloShopUsers', JSON.stringify(users));
-            localStorage.setItem('pabloShopOrders', JSON.stringify(orders));
-            
-            cart = [];
-            document.getElementById('cartModal').style.display = 'none';
-            document.getElementById('userBalance').textContent = users[currentUser].balance.toLocaleString();
-            
-            alert(`Order #${order.id} completed! Check your account for details.`);
-            loadUserOrders();
-        }
-
-        function loadUserOrders() {
-            if (currentUser && orders[currentUser]) {
-                const history = document.getElementById('orderHistory');
-                history.innerHTML = orders[currentUser].slice(0, 5).map(order => `
-                    <div class="order-item">
-                        <strong>Order #${order.id}</strong><br>
-                        <small>${order.date} - ${order.total.toLocaleString()} Rubux</small>
-                    </div>
-                `).join('') || '<p>No orders yet</p>';
-            }
-        }
-
-        // === RENDER PRODUCTS ===
+        // Render Products
         function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = products.map(product => `
-                <div class="product-card" onclick="addToCart(${product.id})">
-                    <div class="product-image">${product.icon}</div>
+            document.getElementById('productsGrid').innerHTML = products.map(p => `
+                <div class="product-card" onclick="addToCart(${p.id})">
+                    <div class="product-image">${p.icon}</div>
                     <div class="product-info">
-                        <div class="product-title">${product.name}</div>
-                        <div class="product-price">${product.price.toLocaleString()} <span style="font-size: 0.8rem;">Rubux</span></div>
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price">${p.price.toLocaleString()} Rubux</div>
                         <button class="buy-btn">Add to Cart</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // === ADMIN PANEL (Password: BestShop22) ===
-        function checkPassword() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === 'BestShop22') {
-                document.getElementById('adminContent').style.display = 'block';
-                const select = document.getElementById('productToEdit');
-                select.innerHTML = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            } else {
-                alert('Wrong password!');
-            }
+        // Cart Functions
+        function addToCart(id) {
+            if (!currentUser) { toggleLogin(); return alert('Login first!'); }
+            const product = products.find(p => p.id === id);
+            const existing = cart.find(item => item.id === id);
+            if (existing) existing.quantity++; else cart.push({...product, quantity: 1});
+            updateCart();
         }
 
-        // === AI SUPPORT (Simple responses) ===
-        function toggleSupport() {
-            const chat = document.getElementById('supportChat');
-            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const messages = document.getElementById('chatMessages');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            messages.innerHTML += `<div class="message user-message">${message}</div>`;
-            input.value = '';
-            
-            setTimeout(() => {
-                const responses = [
-                    "Your order has been processed successfully!",
-                    "Rubux payments are secure and instant.",
-                    "Contact support@pabloshop.com for issues.",
-                    "All products have instant delivery.",
-                    "Login to view your order history."
-                ];
-                const response = responses[Math.floor(Math.random() * responses.length)];
-                messages.innerHTML += `<div class="message ai-message">${response}</div>`;
-                messages.scrollTop = messages.scrollHeight;
-            }, 1000);
-        }
-
-        // === INIT ===
-        window.onload = function() {
-            renderProducts();
-            updateCartDisplay();
-            
-            // Smooth scrolling
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-                });
-            });
-       
+        function updateCart() {
+            document.getElementById('cartCount').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+            const total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            document.getElementById('cartTotal').textContent = total.toLocaleString();
+            document.getElementById('cartTotalItems').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+            document.getElementById('cartItems').innerHTML = cart.map(i => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #eee;">
+                    <div>${i.icon} ${i.name} <small>x${i.quantity}</small></div>
+                    <div>${(i.price * i
